@@ -2,8 +2,9 @@ module Main where
 
 import Lib
 
-import Prelude hiding ((/))
-
+--import Prelude hiding ((/))
+import Data.Maybe (catMaybes) -- [Maybe a] -> [a]
+import Control.Applicative ((<*>))
 {-
     syntatic category which maybe either a primitive like S, NP, N etc
     or function which constructing by forward or backward functor on other categories
@@ -90,6 +91,28 @@ backwardTypeRaising :: Category -> Category -> Category
 backwardTypeRaising x t = t :\ (t :/ x)
 
 
+-- very simple usage of type raising
+-- X • (Y \ X) / Z => Y / (Y \ X) • (Y \ X) / Z (>T) => Y / Z (>B)
+forwardTypeRaisingComposition :: Combinator
+forwardTypeRaisingComposition x right@((y :\ x') :/ z)
+        | x == x' = forwardComposition (forwardTypeRaising x y) right
+forwardTypeRaisingComposition _ _ = Nothing
+
+-- X • (Y / X) \ Z => Y \ (Y / X) • (Y / X) \ Z (<T) => Y \ Z (<B)
+backwardTypeRaisingComposition :: Combinator
+backwardTypeRaisingComposition x right@((y :/ x') :\ z)
+        | x == x' = backwardComposition (backwardTypeRaising x y) right
+backwardTypeRaisingComposition _ _ = Nothing
+
+-- (X \ Y) / Z • R => (X \ Y) / Z • Z / (Z \ R) (>T) => (X \ Y) / (Z \ R) (>B)
+leftForwardTypeRaisingComposition :: Combinator
+leftForwardTypeRaisingComposition left@((x :\ y) :/ z) r = forwardComposition left (forwardTypeRaising r z)
+leftForwardTypeRaisingComposition _ _ = Nothing
+
+-- (X / Y) \ Z • R => (X / Y) \ Z • Z \ (Z / R) (<T) => (X / Y) \ (Z / R) (<B)
+leftBackwardTypeRaisingComposition :: Combinator
+leftBackwardTypeRaisingComposition left@((x :/ y) :\ z) r = backwardComposition left (backwardTypeRaising r z)
+leftBackwardTypeRaisingComposition _ _ = Nothing
 
 -- exception of combinators
 -- X conj X => x (<&>)
@@ -98,7 +121,37 @@ coordination x CONJ x' | x == x' = Just x
 coordination _ _ _ = Nothing
 
 
+-- version of map which gets two items of list applying function to them and passes to new list
+-- from list with length n you get n-1 length list: [a, b, c] => [f a b, f b c]
+map2 :: (a -> a -> b) -> [a] -> [b]
+map2 f (a : tail@(b : _)) = f a b : map2 f tail
+map2 _ _ = []
+
+parse :: [Combinator] -> [[[Category]]] -> [Category]
+parse [] _ = []
+parse rules table@(lastline:_)  
+        | length lastline <= 1 = concat lastline
+        | otherwise = parse rules (map2 (derive rules) lastline : table)
+        -- derive get two lists of possible categories and tries apply each rule with each combination of list production
+        -- and then removes impossible rule applications 
+parse _ _ = []
+
+
+derive rules leftCats rightCats = catMaybes (rules <*> leftCats <*> rightCats)
+
+_derive = derive defaultCombinatorsSet
+
+defaultCombinatorsSet = 
+        [
+            forwardApplication, backwardApplication,
+            forwardComposition, backwardComposition,
+            forwardSubstitution, backwardXSubstitution
+            --forwardTypeRaisingComposition, backwardTypeRaisingComposition, leftForwardTypeRaisingComposition, leftBackwardTypeRaisingComposition
+        ]
+
 transitiveVerb = (S :\ NP) :/ NP
+
+sample = parse defaultCombinatorsSet [[[NP], [transitiveVerb], [NP]]]
 
 main :: IO ()
 main = someFunc
