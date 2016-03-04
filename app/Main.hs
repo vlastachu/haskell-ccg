@@ -17,6 +17,7 @@ data Category =
     | N
     | S 
     | CONJ 
+    | NON -- need for chart
     deriving (Show, Read, Eq)
 
 isFunctor :: Category -> Bool
@@ -27,8 +28,10 @@ isFunctor _        = False
 isPrimitive :: Category -> Bool
 isPrimitive = not . isFunctor 
 
+data CellData = CellData {category :: Category, catName :: String, middle :: Integer, leftArg :: Category, rightArg :: Category} deriving (Show, Read, Eq)
+
 -- Cell data down right diagonal
-data Chart = Cell [Category] Chart Chart Chart | End deriving (Show, Read, Eq)
+data Chart = Cell CellData Chart Chart Chart | End deriving (Show, Read, Eq)
 
 getColumn   End                  = []
 getColumn   (Cell val chart _ _) = val : (getColumn chart)
@@ -42,7 +45,7 @@ chartToList chart'@(Cell val chart _ _) = getRow chart' : (chartToList chart)
 
 listToChartRow :: [[Category]] -> Chart
 listToChartRow []     = End
-listToChartRow (x:xs) = Cell x End (listToChartRow xs) End
+listToChartRow (x:xs) = Cell (map (\x' -> CellData x' "" 0 NON NON) x) End (listToChartRow xs) End
 
 type Combinator =  Category         -- left lexeme
                 -> Category         -- right lexeme
@@ -136,28 +139,35 @@ coordination _ _ _ = Nothing
 
 
 
-parse :: [Combinator] -> [[Category]] -> Chart
+parse :: [(Combinator, String)] -> [[Category]] -> Chart
 parse rules lexemes = parse_iter rules (listToChartRow lexemes)
 
-parse_iter :: [Combinator] -> Chart -> Chart
+-- version of zipWith with number of iteration
+zipWithIterNum :: (Integer -> a -> b -> c) -> [a] -> [b] -> [c]
+zipWithIterNum fun l r = zipWithIterNum' 0 l r 
+    where n = length l
+          zipWithIterNum' _ [] _ = []
+          zipWithIterNum' _ _ [] = []
+          zipWithIterNum' i (x:xs) (y:ys) = (fun i x y):(zipWithIterNum' (i + 1) xs ys )
+
+
+parse_iter :: [(Combinator, String)] -> Chart -> Chart
 -- parsing until pyramid have 1 block in top row (right link is End in first cell)
 parse_iter _ chart@(Cell _ _ End _) = chart
 parse_iter rules chart = parse_iter rules (put_cell chart)
-    where put_cell (Cell val _ End _) = End
+    where -- put cell until there is two cell under new 
+          put_cell (Cell val _ End _) = End
+          -- put cell with: one last at down, one new at right and one last on diagonal
           put_cell chart@(Cell _ _ right _) = Cell (cellData chart) chart (put_cell right) right
-          cellData chart@(Cell _ _ right _) = cellData' (getColumn chart) (reverse $ getDiagonal right)
-          cellData' lefts rights = catMaybes $ concat (zipWith (applyRules rules) lefts rights) -- unique
-          applyRules rules ls rs = rules <*> ls <*> rs
-
-derive rules leftCats rightCats = catMaybes (rules <*> leftCats <*> rightCats)
-
-_derive = derive defaultCombinatorsSet
+          cellData chart@(Cell _ _ right _) = applyRulesToDerivations (getColumn chart) (reverse $ getDiagonal right)
+          applyRulesToDerivations downList diagList = catMaybes $ concat (zipWithIterNum (applyRules rules) downList diagList) -- unique
+          applyRules num rules lefts rights = [CellData (rule left right) name num left right| left <- lefts, right <- rights, (rule, name) <- rules]
 
 defaultCombinatorsSet = 
         [
-            forwardApplication, backwardApplication,
-            forwardComposition, backwardComposition,
-            forwardSubstitution, backwardXSubstitution
+            (forwardApplication, ">"), (backwardApplication, "<"),
+            (forwardComposition, ">B"), (backwardComposition, "<B"),
+            (forwardSubstitution, ">S"), (backwardXSubstitution, "<S")
             --forwardTypeRaisingComposition, backwardTypeRaisingComposition, leftForwardTypeRaisingComposition, leftBackwardTypeRaisingComposition
         ]
 
