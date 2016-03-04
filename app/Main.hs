@@ -19,8 +19,13 @@ data Category =
     | CONJ 
     deriving (Show, Read, Eq)
 
---(//) = ForwardFunctor
---(\\) = BackwardFunctor
+isFunctor :: Category -> Bool
+isFunctor (_ :/ _) = True
+isFunctor (_ :\ _) = True
+isFunctor _        = False
+
+isPrimitive :: Category -> Bool
+isPrimitive = not . isFunctor 
 
 -- Cell data down right diagonal
 data Chart = Cell [Category] Chart Chart Chart | End deriving (Show, Read, Eq)
@@ -38,14 +43,6 @@ chartToList chart'@(Cell val chart _ _) = getRow chart' : (chartToList chart)
 listToChartRow :: [[Category]] -> Chart
 listToChartRow []     = End
 listToChartRow (x:xs) = Cell x End (listToChartRow xs) End
-
-isFunctor :: Category -> Bool
-isFunctor (_ :/ _) = True
-isFunctor (_ :\ _) = True
-isFunctor _        = False
-
-isPrimitive :: Category -> Bool
-isPrimitive = not . isFunctor 
 
 type Combinator =  Category         -- left lexeme
                 -> Category         -- right lexeme
@@ -138,42 +135,14 @@ coordination x CONJ x' | x == x' = Just x
 coordination _ _ _ = Nothing
 
 
--- version of map which gets two items of list applying function to them and passes to new list
--- from list with length n you get n-1 length list: [a, b, c] => [f a b, f b c]
-map2 :: (a -> a -> b) -> [a] -> [b]
-map2 f (a : tail@(b : _)) = f a b : map2 f tail
-map2 _ _ = []
 
-parse :: [Combinator] -> [[[Category]]] -> [Category]
-parse [] _ = []
-parse rules table@(lastline:_)  = head $ concat (parse_iter rules table (length lastline) 1)
-{-        | length lastline <= 1 = concat lastline
-        | otherwise = parse rules (map2 (derive rules) lastline : table)
-        where-} 
-        -- derive get two lists of possible categories and tries apply each rule with each combination of list production
-        -- and then removes impossible rule applications 
-parse _ _ = []
--- first step = 2, n = length
-parse_iter :: [Combinator] -> [[[Category]]] -> Int -> Int -> [[[Category]]]
-parse_iter rules table n step --n = 3,  step = 1
-        | n == step = table 
-        | otherwise = parse_iter rules (put_line:table) n (step + 1)
-        where put_line     = map put_cell [n - step..1] -- j = 1..1
-              get_cell' i j = table !! (i - 1) !! (j - 1)
-              get_cell i j 
-                    | i-1 >= length table = error $ "at i; " ++ show (i, j)  ++ "\n" ++ show table
-                    | j-1 >= length (table !! (i-1)) = error $ "at j; " ++ show (i, j) ++ "\n" ++ show table
-                    | otherwise = get_cell' i j
-              put_cell j   = catMaybes [ rule left right | k <- [1..step], left <- get_cell (step + 1 - k) j, -- j = 1, k = 1..2
-                                right <- get_cell k (j + k),  rule <- rules] -- kkk
+parse :: [Combinator] -> [[Category]] -> Chart
+parse rules lexemes = parse_iter rules (listToChartRow lexemes)
 
-
-parse' :: [Combinator] -> [[Category]] -> Chart
-parse' rules lexemes = parse'' rules (listToChartRow lexemes)
-
-parse'' :: [Combinator] -> Chart -> Chart
-parse'' _ chart@(Cell _ _ End _) = chart
-parse'' rules chart = parse'' rules (put_cell chart)
+parse_iter :: [Combinator] -> Chart -> Chart
+-- parsing until pyramid have 1 block in top row (right link is End in first cell)
+parse_iter _ chart@(Cell _ _ End _) = chart
+parse_iter rules chart = parse_iter rules (put_cell chart)
     where put_cell (Cell val _ End _) = End
           put_cell chart@(Cell _ _ right _) = Cell (cellData chart) chart (put_cell right) right
           cellData chart@(Cell _ _ right _) = cellData' (getColumn chart) (reverse $ getDiagonal right)
@@ -194,8 +163,7 @@ defaultCombinatorsSet =
 
 transitiveVerb = (S :\ NP) :/ NP
 
-sample = parse defaultCombinatorsSet [[[NP], [transitiveVerb], [NP]]]
-sample' = parse' defaultCombinatorsSet [[NP :/ N], [N], [transitiveVerb], [NP]]
+sample = parse defaultCombinatorsSet [[NP :/ N], [N], [transitiveVerb], [NP]]
 
 main :: IO ()
 main = someFunc
