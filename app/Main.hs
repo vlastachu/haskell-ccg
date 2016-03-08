@@ -163,13 +163,6 @@ coordination _ _ _ = Nothing
 parse :: [(Combinator, String)] -> [(String, [Category])] -> Chart
 parse rules lexemes = parse_iter rules (listToChartRow lexemes)
 
--- version of zipWith with number of iteration
-zipWithIterNum :: (Integer -> a -> b -> c) -> [a] -> [b] -> [c]
-zipWithIterNum fun l r = zipWithIterNum' 0 l r 
-    where n = length l
-          zipWithIterNum' _ [] _ = []
-          zipWithIterNum' _ _ [] = []
-          zipWithIterNum' i (x:xs) (y:ys) = (fun i x y):(zipWithIterNum' (i + 1) xs ys )
 
 
 parse_iter :: [(Combinator, String)] -> Chart -> Chart
@@ -182,8 +175,8 @@ parse_iter rules chart = parse_iter rules (put_cell chart)
       put_cell chart@(Cell _ _ right _) = Cell (cellData chart) chart (put_cell right) right
       cellData chart@(Cell _ _ right _) = applyRulesToDerivations (getColumn chart) (reverse $ getDiagonal right)
       applyRulesToDerivations downList diagList 
-            = catMaybes $ concat (zipWithIterNum applyRules downList diagList) -- unique
-      applyRules num lefts rights = 
+            = catMaybes $ concat (zipWith applyRules downList diagList) -- unique
+      applyRules lefts rights = 
         [(\x -> CellData x name (ParsePath ldata rdata)) <$> (rule left right) | 
             ldata@(CellData left  _ _) <- lefts, 
             rdata@(CellData right _ _) <- rights, 
