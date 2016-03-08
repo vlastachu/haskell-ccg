@@ -55,7 +55,9 @@ Then we may use applicative ap or list comprehension to enumerate all possible c
 - [x] CYK algorithm
 - [x] Parse path
 - [x] Simple parsing path output
+- [ ] Implement `Coordination` rule with two `CONJ` categories. 
 - [ ] Take any popular ccg vocabulary format as part of input
+- [ ] Write some test scenaries which take more time.
 - [ ] Remove fake paths
 - [ ] Division on json output and js render 
 - [ ] Full browser interface (input phrase and grammar and fancy things in output)
