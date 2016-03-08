@@ -63,3 +63,15 @@ Then we may use applicative ap or list comprehension to enumerate all possible c
 - [ ] Maybe analysis of efficiency of parallel execution on haskell
 
 ## Install and use
+
+Edit `sample` in code (there is no input interface now) in format [("word", [combinators...])...].
+
+```
+stack setup
+stack install
+haskell-ccg-exe
+```
+
+Open `output.html`. You should see something like this:
+
+![output.html](http://i.imgur.com/6qbnmCk.png?1)
