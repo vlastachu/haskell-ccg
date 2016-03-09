@@ -37,11 +37,11 @@ For square chart it would look like:
 
 ```
 [.] [ ] [ ] [ ] 
-[3] [1] [ ] [ ] 
+[1] [3] [ ] [ ] 
 [2] [ ] [2] [ ] 
-[1] [ ] [ ] [3] 
+[3] [ ] [ ] [1] 
 
-Derivation of cell 4x1 = (try combinators on 1) U (try combinators on 2) U (try combinators on 3)
+Derivation of cell 4x1 = (try combination rules on 1) U (try combination rules on 2) U (try combination rules on 3)
 ```
 
 In simple words derivation for cell is like zipping between column list and reversed diagonal list. So I implement 
