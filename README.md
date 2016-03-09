@@ -24,11 +24,12 @@ Second loop adds cells from right to left (also easy). Let's consider what's hap
 For example take 4'th row 1'st column. We should try use rules on categories from 3 possible ways of derivation. 
 
 ```
-     /\                        /\                         / \
-    /\  \                    /   \                      /    /\
-   /   \  \                 /      \                   /    /   \
-  /\    \   \             /\        /\                /    /    /\
- /   \    \   \          /   \     /  \              /    /    /  \
+        .                       .                          .
+       / \                     / \                        / \
+      /\  \                   /   \                      /  /\
+     /  \  \                 /     \                    /  /  \
+    /\   \  \               /\     /\                  /  /   /\
+   /  \   \  \             /  \   /  \                /  /   /  \
 The roses are red       The roses are red          The roses are red
 ```
 
