@@ -18,8 +18,8 @@ data Category =
     | NP
     | N
     | S 
+    | Conjunct Category
     | CONJ 
-    | NON -- need for chart
     deriving (Show, Read, Eq)
 
 prettyShow (l :/ r) = prettyShow l ++ " / "  ++ prettyShow r
@@ -154,9 +154,15 @@ leftBackwardTypeRaisingComposition _ _ = Nothing
 
 -- exception of combinators
 -- X conj X => x (<&>)
-coordination :: Category -> Category -> Category -> Maybe Category
-coordination x CONJ x' | x == x' = Just x
-coordination _ _ _ = Nothing
+-- so we can implement him in two steps
+
+halfCoordination :: Combinator
+halfCoordination CONJ x = Just $ Conjunct x
+halfCoordination _ _ = Nothing
+
+coordination :: Combinator
+coordination x (Conjunct x') | x == x' = Just x
+coordination _ _ = Nothing
 
 
 
@@ -187,19 +193,21 @@ defaultCombinatorsSet =
             (forwardApplication, ">"), (backwardApplication, "<"),
             (forwardComposition, ">B"), (backwardComposition, "<B"),
             (forwardSubstitution, ">S"), (backwardXSubstitution, "<S"),
+            (halfCoordination, "~&"), (coordination, "&"),
             (forwardTypeRaisingComposition, ">T"), (backwardTypeRaisingComposition, "<T"),
             (leftForwardTypeRaisingComposition, "<>T"), (leftBackwardTypeRaisingComposition, "<<T")
         ]
 
 transitiveVerb = (S :\ NP) :/ NP
 
-sample = parse defaultCombinatorsSet [("Mary", [NP]), ("loves", [transitiveVerb]), ("John", [NP])]
+sample = parse defaultCombinatorsSet [("I", [NP]), ("dislike", [transitiveVerb]), ("and", [CONJ]), ("Mary", [NP]), ("likes", [transitiveVerb]), ("musicals", [NP])]
+--sample = parse defaultCombinatorsSet [("Mary", [NP]), ("loves", [transitiveVerb]), ("John", [NP])]
 --sample = parse defaultCombinatorsSet [("There", [NP]), ("may", [(S:\NP):/(S:\NP)]), ("be", [transitiveVerb]), 
 --    ("others", [N]), ("doing", [transitiveVerb]), ("what", [NP:/(S:/NP)]), ("she", [NP]), ("did", [transitiveVerb])
 --    ]
 
 html content = "<html><head>" ++
-    "<style>* {padding:0; margin: 0} .root{padding:20px}.category{display:inline-block; padding: 0px 15px 15px 0px; text-align:center; vertical-align:top}</style>"
+    "<style>* {padding:0; margin: 0} .root{padding:20px}.word{padding:0px 10px 0px 10px}hr{margin-bottom:3px}.category{display:inline-block; padding-bottom: 11px; text-align:center; vertical-align:top}</style>"
     ++ "<title>result</title></head><body>" ++ content ++ "</body>"
 
 chartToHtml :: Chart -> String

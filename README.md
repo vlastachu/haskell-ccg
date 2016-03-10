@@ -24,13 +24,14 @@ Second loop adds cells from right to left (also easy). Let's consider what's hap
 For example take 4'th row 1'st column. We should try use rules on categories from 3 possible ways of derivation. 
 
 ```
-        .                       .                          .
-       / \                     / \                        / \
-      /\  \                   /   \                      /  /\
-     /  \  \                 /     \                    /  /  \
-    /\   \  \               /\     /\                  /  /   /\
-   /  \   \  \             /  \   /  \                /  /   /  \
-The roses are red       The roses are red          The roses are red
+        1.a                    1.b                    2                      3.a                    3.b
+        .                      .                      .                      .                      .
+       / \                    / \                    / \                    / \                    / \
+      /\  \                  /\  \                  /   \                  /  /\                  /  /\
+     /  \  \                /  \  \                /     \                /  /  \                /  /  \
+    /\   \  \              /   /\  \              /\     /\              /  /\   \              /  /   /\
+   /  \   \  \            /   /  \  \            /  \   /  \            /  /  \   \            /  /   /  \
+The roses are red      The roses are red      The roses are red      The roses are red      The roses are red
 ```
 
 For square chart it would look like:
@@ -42,6 +43,8 @@ For square chart it would look like:
 [3] [ ] [ ] [1] 
 
 Derivation of cell 4x1 = (try combination rules on 1) U (try combination rules on 2) U (try combination rules on 3)
+
+Ambigious of a and b paths for 1 and 3 cases is created by cells 3x1 and 3x2 which have 2 paths of parsing.
 ```
 
 In simple words derivation for cell is like zipping between column list and reversed diagonal list. So I implement 
@@ -56,7 +59,7 @@ Then we may use applicative ap or list comprehension to enumerate all possible c
 - [x] CYK algorithm
 - [x] Parse path
 - [x] Simple parsing path output
-- [ ] Implement `Coordination` rule with two `CONJ` categories. 
+- [x] Implement `Coordination` rule with two `CONJ` categories. 
 - [ ] Take any popular ccg vocabulary format as part of input
 - [ ] Write some test scenaries which take more time.
 - [ ] Remove fake paths
