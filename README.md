@@ -42,7 +42,8 @@ For square chart it would look like:
 [2] [ ] [2] [ ] 
 [3] [ ] [ ] [1] 
 
-Derivation of cell 4x1 = (try combination rules on 1) U (try combination rules on 2) U (try combination rules on 3)
+Derivation of cell 4x1 = 
+    (try combination rules on 1) U (try combination rules on 2) U (try combination rules on 3)
 
 Ambigious of a and b paths for 1 and 3 cases is created by cells 3x1 and 3x2 which have 2 paths of parsing.
 ```
@@ -81,3 +82,38 @@ haskell-ccg-exe
 Open `output.html`. You should see something like this:
 
 ![output.html](http://i.imgur.com/6qbnmCk.png?1)
+
+## Papers and links
+
+- CCG
+    - Mark Steedman "A Very Short Introduction to CCG"; 1996y; 8p; [link](http://www.inf.ed.ac.uk/teaching/courses/nlg/readings/ccgintro.pdf)
+    - Mark Steedman and Jason Baldridge "COMBINATORY CATEGORIAL GRAMMAR"; 200Xy; 62p; [link](http://homepages.inf.ed.ac.uk/steedman/papers/ccg/SteedmanBaldridgeNTSyntax.pdf)
+    - David J. Weir "COMBINATORY CATEGORIAL RELATIONSHIP TO LINEAR GRAMMARS: GENERATIVE POWER AND CONTEXT-FREE REWRITING SYSTEMS" 1988y; 8p; [link](http://www.anthology.aclweb.org/P/P88/P88-1034.pdf)
+    - Not seems to be useful
+        - JOACHIM LAMBEK "Type Grammars as Pregroups"; 2001y; 19p; [link](http://www.ling.ohio-state.edu/~dowty/CG/lambek-pregroups.pdf)
+        - Michael Moortgat "Categorial Type Logics"; 1997y; 54p; [link](http://www.let.uu.nl/~Michael.Moortgat/personal/Courses/hlola98.pdf)
+- Parsing
+    - Shift-Reduce
+        - Yue Zhang, Stephen Clark "Shift-Reduce CCG Parsing"; 2011y; 10p; [link](www.cl.cam.ac.uk/~sc609/pubs/acl11yue.pdf)
+        - Stephen Merity and James R. Curran "Frontier Pruning for Shift-Reduce ccg Parsing"; 2011y; presentation 38p; [link](http://smerity.com/media/files/academic/alta2011_presentation.pdf)
+        - STEPHEN MERITY (Curran supervisor) "Integrated Tagging and Pruning via Shift-Reduce CCG Parsing"; 2011; 104p; [link](http://smerity.com/media/files/academic/smerity_thesis.pdf)
+    - CKY algorithm
+        - Laura Kallmeyer, Magnus Roos "Parsing Cocke Younger Kasami" - CKY basics on CFG; [link](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/cyk.pdf)
+        - K. Vijay-Shanker, David J. Weir "POLYNOMIAL TIME PARSING OF COMBINATORY CATEGORIAL GRAMMARS"; 1990y; 8p; [link](http://www.aclweb.org/anthology/P90-1001)
+        - K. Vijay-Shanker, David J. Weir "Parsing Some Constrained Grammar Formalisms" - for TAG and CCG; 1993y; 46p; [link](http://www.aclweb.org/anthology/J93-4002)
+        - Bojan Djordjevic and James R. Curran "Efficient Combinatory Categorial Grammar Parsing" - CKY + Supertagging; 2006y; 8p; [link](http://rp-www.cs.usyd.edu.au/~james/pubs/ps/altw06efficiency.ps)
+        - Bojan Djordjevic and James R. Curran, Stephen Clark "Improving the Efficiency of a Wide-Coverage CCG Parser"; 2007y; 9p; [link](http://www.aclweb.org/anthology/W07-2206)
+        - Kurt Keutzer, Slav O Petrov, Youngmin Yi "Efficient parallel CKY parsing using GPUs"; 2011y; 266p; (no link: parsing-technologies-2011-proceedings.pdf) [11 pages?](http://www.aclweb.org/anthology/W11-2921)
+        - Tanin Na Nakorn "Combinatory Categorial Grammar Parser in Natural Language Toolkit" - about type raising problem; 2009y; 59p; [link](http://www.inf.ed.ac.uk/publications/thesis/online/IM090710.pdf)
+    - A* algorithm
+        - Mike Lewis, Mark Steedman "A* CCG Parsing with a Supertag-factored Model"; 2014y; 11p; [link](http://www.aclweb.org/anthology/D14-1107)
+        - Michael Auli, Adam Lopez "Efficient CCG Parsing: A* versus Adaptive Supertagging"; 2011y; 9p; [link](http://www.aclweb.org/anthology/P11-1158)
+    - not categorized
+        - Stephen Clark, James R. Curran "Wide-Coverage Efficient Statistical Parsing with CCG and Log-Linear Models"; 2006y; 57p; [link](www.cl.cam.ac.uk/~sc609/pubs/cl06parser.pdf)
+        - Marco Kuhlmann, Giorgio Satta "A New Parsing Algorithm for Combinatory Categorial Grammar" - compares with 1990 CKY algorithm; 2014y; 14p; [link](http://www.aclweb.org/anthology/Q14-1032)
+- Implementations
+    - NLTK CKY [github source](https://github.com/nltk/nltk/blob/develop/nltk/ccg/chart.py)
+        - Tanin NLTK changes [github blame](https://github.com/tanin47/nltk/blame/tanin-remove-unnecessary-type-raise/nltk/ccg/chart.py) (TODO: see other branches)
+    - C&C Tools - (CKY?) with probabilistick ranging [svn](http://svn.ask.it.usyd.edu.au/trac/candc/) see also "Wide-Coverage Efficient Statistical Parsing with CCG and Log-Linear Models"
+    - OpenCCG - CKY [github](https://github.com/OpenCCG/openccg)
+    - EasyCCG - A* [github](https://github.com/mikelewis0/easyccg)
