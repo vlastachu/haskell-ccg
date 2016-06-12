@@ -108,6 +108,8 @@ Open `output.html`. You should see something like this:
     - A* algorithm
         - Mike Lewis, Mark Steedman "A* CCG Parsing with a Supertag-factored Model"; 2014y; 11p; [link](http://www.aclweb.org/anthology/D14-1107)
         - Michael Auli, Adam Lopez "Efficient CCG Parsing: A* versus Adaptive Supertagging"; 2011y; 9p; [link](http://www.aclweb.org/anthology/P11-1158)
+        - [LSTM CCG Parsing](http://homes.cs.washington.edu/~lsz/papers/llz-naacl16.pdf)
+        >> Parsing models either use these scores directly (Auli and Lopez, 2011b), or as a form of beam search (Clark and Curran, 2007), typically in conjunction with models of the dependencies or derivation.
     - not categorized
         - Stephen Clark, James R. Curran "Wide-Coverage Efficient Statistical Parsing with CCG and Log-Linear Models"; 2006y; 57p; [link](www.cl.cam.ac.uk/~sc609/pubs/cl06parser.pdf)
         - Marco Kuhlmann, Giorgio Satta "A New Parsing Algorithm for Combinatory Categorial Grammar" - compares with 1990 CKY algorithm; 2014y; 14p; [link](http://www.aclweb.org/anthology/Q14-1032)
